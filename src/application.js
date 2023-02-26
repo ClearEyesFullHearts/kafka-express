@@ -53,7 +53,7 @@ class Application extends Handler {
   mount(topic) {
     if (topic instanceof Topic) {
       this.stack.push(topic);
-      this.topics.push(topic.name);
+      this.topics.push(topic.regexp);
     } else {
       throw new Error('Only topics can be mounted');
     }
@@ -71,7 +71,7 @@ class Application extends Handler {
     await this.consumer.connect();
     await this.consumer.subscribe({ topics: this.topics });
 
-    debug(`Server connected to ${brokers}`);
+    const self = this;
 
     await this.consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
@@ -83,7 +83,7 @@ class Application extends Handler {
           headers: message.headers,
         };
         await new Promise((resolve, reject) => {
-          function nextInApp(err) {
+          function endNext(err) {
             if (err) {
               reject(err);
               return;
@@ -93,10 +93,12 @@ class Application extends Handler {
           const res = {
             end: () => resolve(),
           };
-          this.handle(req, res, nextInApp);
+          self.handle(req, res, endNext);
         });
       },
     });
+
+    debug(`Server connected to ${brokers}`);
   }
 
   async stop() {

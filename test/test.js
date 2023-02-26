@@ -9,32 +9,53 @@ async function mytest() {
   const producer = kafka.producer();
 
   await producer.connect();
-  await producer.send({
-    topic: 'test-topic-1',
-    messages: [
-      { key: 'key1', value: JSON.stringify({ message: 'hello world' }) },
-      { key: 'key2', value: JSON.stringify({ message: 'hey hey!' }) },
-    ],
-  });
+  // await producer.send({
+  //   topic: 'test-topic-1',
+  //   messages: [
+  //     { key: 'key1', value: JSON.stringify({ message: 'hello world' }) },
+  //     { key: 'key2', value: JSON.stringify({ message: 'hey hey!' }) },
+  //   ],
+  // });
+
+  // await producer.send({
+  //   topic: 'test-topic-3',
+  //   messages: [
+  //     { key: 'key1', value: JSON.stringify({ message: 'Im gonna errored' }) },
+  //   ],
+  // });
+
+  // await producer.send({
+  //   topic: 'test-topic-4',
+  //   messages: [
+  //     { key: 'key1', value: JSON.stringify({ message: 'im a request' }) },
+  //   ],
+  // });
+
+  // await producer.send({
+  //   topic: 'test-topic-2',
+  //   messages: [
+  //     { key: 'key1', value: JSON.stringify({ message: 'chain me' }) },
+  //   ],
+  // });
 
   await producer.send({
-    topic: 'test-topic-3',
-    messages: [
-      { key: 'key1', value: JSON.stringify({ message: 'Im gonna errored' }) },
-    ],
-  });
-
-  await producer.send({
-    topic: 'test-topic-4',
+    topic: 'test.topic.user',
     messages: [
       { key: 'key1', value: JSON.stringify({ message: 'im a request' }) },
     ],
   });
 
   await producer.send({
-    topic: 'test-topic-2',
+    topic: 'test.34.topic',
     messages: [
-      { key: 'key1', value: JSON.stringify({ message: 'chain me' }) },
+      { key: 'key1', value: JSON.stringify({ message: 'im a request' }) },
+    ],
+  });
+
+  await producer.send({
+    topic: 'test.topic.app',
+    messages: [
+      { key: 'key1', value: JSON.stringify({ message: 'im a request' }) },
     ],
   });
 }
