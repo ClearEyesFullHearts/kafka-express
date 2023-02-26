@@ -59,13 +59,19 @@ class Application extends Handler {
     }
   }
 
-  async listen({ clientId, brokers, groupId }) {
-    const kafka = new Kafka({
-      clientId,
-      brokers,
-    });
+  async listen(clientConfig, consumerConfig) {
+    const { clientId, brokers } = clientConfig;
+    const { groupId } = consumerConfig;
 
-    this.consumer = kafka.consumer({ groupId });
+    // minimum required config for kafka
+    if (!clientId) throw new Error('clientId is mandatory in clientConfig');
+    if (!brokers) throw new Error('brokers is mandatory in clientConfig');
+    if (!groupId) throw new Error('groupId is mandatory in consumerConfig');
+    if (!this.topics || !this.topics.length || this.topics.length < 1) throw new Error('You need to subscribe to at least one topic');
+
+    const kafka = new Kafka(clientConfig);
+
+    this.consumer = kafka.consumer(consumerConfig);
 
     debug('Server connecting...');
     await this.consumer.connect();

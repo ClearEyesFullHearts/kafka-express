@@ -52,16 +52,13 @@ server.mount(outTopic);
 
 server.use(myguyErrored);
 
-server.listen({
+const clConf = {
   clientId: 'kafka-express-test',
   brokers: ['localhost:9092'],
+};
+
+const csConf = {
   groupId: 'kafka-express-test-consumer',
-}).catch(async (error) => {
-  console.error(error);
-  try {
-    await server.stop();
-  } catch (e) {
-    console.error('Failed to gracefully disconnect', e);
-  }
-  process.exit(1);
-});
+};
+
+server.listen(clConf, csConf);
