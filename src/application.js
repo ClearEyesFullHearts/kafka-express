@@ -16,6 +16,8 @@ const debug = require('debug')('kafka-express:application');
 const Handler = require('./handler');
 const Topic = require('./topic');
 const Layer = require('./topic/layer');
+const Request = require('./request');
+const Response = require('./response');
 
 const { slice } = Array.prototype;
 
@@ -80,25 +82,19 @@ class Application extends Handler {
     const self = this;
 
     await this.consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const req = {
-          topic,
-          partition,
-          key: message.key.toString(),
-          value: JSON.parse(message.value.toString()),
-          headers: message.headers,
-        };
+      eachMessage: async (kafkaMessage) => {
         await new Promise((resolve, reject) => {
+          const req = new Request(kafkaMessage);
+          const res = new Response(req, resolve);
+          req.res = res;
+
           function endNext(err) {
             if (err) {
               reject(err);
               return;
             }
-            resolve();
+            res.end();
           }
-          const res = {
-            end: () => resolve(),
-          };
           self.handle(req, res, endNext);
         });
       },
