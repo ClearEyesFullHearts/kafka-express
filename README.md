@@ -2,7 +2,7 @@
 A kafka consuming server in the style of Express.js
   
 ### "kafka consuming server"  
-Start a server that consumes messages from a kafka server, listening to one or more topics.  
+Start a server that consumes messages from a kafka server, listening to one or more topics, powered by [KafkaJS](https://kafka.js.org/docs/getting-started).  
   
 ### "in the style of Express.js"  
 Defines the topics you want to listen to as express routes and add middlewares to them, just like you would to an express server.  
@@ -25,6 +25,11 @@ server.use('my-test-topic', (req, res, next) => {
 
 server.use('another-test-topic', (req, res, next) => {
   console.log('another-test-topic middleware');
+  res.end();
+});
+
+server.use('test.topic.*', (req, res, next) => {
+  console.log('all topics that start by test.topic middleware');
   res.end();
 });
 
