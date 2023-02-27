@@ -88,7 +88,7 @@ class Application extends Handler {
     debug(`Server connected to ${brokers}`);
   }
 
-  async onMessage(kafkaMessage){
+  async onMessage(kafkaMessage) {
     await new Promise((resolve, reject) => {
       const req = new Request(kafkaMessage);
       const res = new Response(req, resolve);
