@@ -75,7 +75,7 @@ const {
   end(), // function to call to end the request-response cycle
 } = res;
 ```
-The request object is an event dispatcher and emits the 'request-ended' event when the request cycle ends.  
+The request object is an event dispatcher and emits the 'close' event when the request cycle ends.  
   
 The "Topic" object replaces the Router object. Note that you can only mount a topic to the application and not on one another.  
 ```javascript

@@ -5,7 +5,7 @@ const server = kafkaExpress();
 function myguyShared(req, res, next) {
   console.log('Shared middleware');
   const start = Date.now();
-  req.once('request-ended', () => {
+  req.once('close', () => {
     console.log(`Request for ${req.topic} ended in ${Math.floor(Date.now() - start)} ms`);
   });
   next();

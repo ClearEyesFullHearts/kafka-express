@@ -37,7 +37,7 @@ class Request extends EventEmitter {
   }
 
   end() {
-    this.emit('request-ended');
+    this.emit('close');
   }
 }
 
