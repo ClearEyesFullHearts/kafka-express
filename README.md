@@ -107,7 +107,6 @@ const kafka = new Kafka(clientConfig);
 
 const consumer = kafka.consumer(consumerConfig);
 
-debug('Server connecting...');
 await consumer.connect();
 await consumer.subscribe({ topics: server.topics });
 
