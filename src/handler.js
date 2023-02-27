@@ -33,6 +33,46 @@ class Handler {
         return fn.apply(this, fnArgs);
       };
     };
+
+    this.getnext = (done, req, res) => {
+      let idx = 0;
+      const handlerName = this.name;
+
+      // middleware and routes
+      const { stack } = this;
+
+      function next(err) {
+        const layerError = err === 'handled'
+          ? null
+          : err;
+
+        // signal to exit router
+        if (layerError === 'handler-exit') {
+          setImmediate(done, null);
+          return;
+        }
+
+        // no more matching layers
+        if (idx >= stack.length) {
+          debug(`Handler ${handlerName} stack is done`);
+          setImmediate(done, layerError);
+          return;
+        }
+
+        // find next layer
+        const layer = stack[idx];
+        idx += 1;
+
+        if (layerError) {
+          debug('have error for ', layer.name);
+          layer.handleError(layerError, req, res, next);
+          return;
+        }
+
+        layer.handle(req, res, next);
+      }
+      return next;
+    };
   }
 
   handleError(err, req, res, out) { // eslint-disable-line class-methods-use-this
@@ -41,43 +81,12 @@ class Handler {
   }
 
   handle(req, res, out) {
-    let idx = 0;
     const handlerName = this.name;
 
-    // middleware and routes
-    const { stack } = this;
+    // // middleware and routes
     const done = this.restore(out, req, 'next');
 
-    function next(err) {
-      const layerError = err === 'handled'
-        ? null
-        : err;
-
-      // signal to exit router
-      if (layerError === 'handler-exit') {
-        setImmediate(done, null);
-        return;
-      }
-
-      // no more matching layers
-      if (idx >= stack.length) {
-        debug(`Handler ${handlerName} stack is done`);
-        setImmediate(done, layerError);
-        return;
-      }
-
-      // find next layer
-      const layer = stack[idx];
-      idx += 1;
-
-      if (layerError) {
-        debug('have error for ', layer.name);
-        layer.handleError(layerError, req, res, next);
-        return;
-      }
-
-      layer.handle(req, res, next);
-    }
+    const next = this.getnext(done, req, res);
 
     // setup next layer
     req.next = next;

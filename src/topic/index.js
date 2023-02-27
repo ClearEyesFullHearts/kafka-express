@@ -26,7 +26,7 @@ class Topic extends Handler {
   }) {
     super();
 
-    this.name = name;
+    this.name = name || '*';
     this.keys = [];
     this.params = undefined;
     this.path = undefined;
@@ -102,13 +102,20 @@ class Topic extends Handler {
   }
 
   handleError(err, req, res, out) {
-    if (req.topic !== this.name) {
-      debug(`Topic ${this.name} do not handle ${req.topic} errors`);
-      setImmediate(out, err);
+    if (this.matchTopic(req.topic)) {
+      req.params = this.params;
+
+      const done = this.restore(out, req, 'next');
+
+      const next = this.getnext(done, req, res);
+      req.next = next;
+
+      next(err);
       return;
     }
 
-    super.handleError(err, req, res, out);
+    debug(`Topic ${this.name} do not handle ${req.topic} errors`);
+    setImmediate(out, err);
   }
 
   handle(req, res, out) {
