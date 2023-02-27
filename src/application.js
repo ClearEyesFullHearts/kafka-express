@@ -79,28 +79,30 @@ class Application extends Handler {
     await this.consumer.connect();
     await this.consumer.subscribe({ topics: this.topics });
 
-    const self = this;
-
     await this.consumer.run({
       eachMessage: async (kafkaMessage) => {
-        await new Promise((resolve, reject) => {
-          const req = new Request(kafkaMessage);
-          const res = new Response(req, resolve);
-          req.res = res;
-
-          function endNext(err) {
-            if (err) {
-              reject(err);
-              return;
-            }
-            res.end();
-          }
-          self.handle(req, res, endNext);
-        });
+        await this.onMessage(kafkaMessage);
       },
     });
 
     debug(`Server connected to ${brokers}`);
+  }
+
+  async onMessage(kafkaMessage){
+    await new Promise((resolve, reject) => {
+      const req = new Request(kafkaMessage);
+      const res = new Response(req, resolve);
+      req.res = res;
+
+      function endNext(err) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        res.end();
+      }
+      this.handle(req, res, endNext);
+    });
   }
 
   async stop() {
