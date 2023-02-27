@@ -8,6 +8,12 @@
   },
   "author": "MFT",
   "license": "MIT",
+  "keywords": [
+    "Kafka",
+    "Express",
+    "middleware"
+  ],
+  "homepage": "https://github.com/ClearEyesFullHearts/kafka-express#readme",
   "dependencies": {
     "array-flatten": "^1.1.1",
     "debug": "^4.3.4",
