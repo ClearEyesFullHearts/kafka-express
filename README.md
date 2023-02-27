@@ -8,7 +8,7 @@ Start a server that consumes messages from a kafka server, listening to one or m
 Defines the topics you want to listen to as express routes and add middlewares to them, just like you would to an express server.  
   
 # Usage  
-```
+```javascript
 const kafkaExpress = require('kafka-express');
 
 const server = kafkaExpress();
@@ -78,7 +78,7 @@ const {
 The request object is an event dispatcher and emits the 'request-ended' event when the request cycle ends.  
   
 The "Topic" object replaces the Router object. Note that you can only mount a topic to the application and not on one another.  
-```
+```javascript
 const { Topic } = require('kafka-express');
 const outTopic = new Topic('test-topic');
 outTopic.use((req, res) => {
@@ -95,7 +95,7 @@ The default separator is "." instead of "/".
 ## KafkaJS
 The "Application.listen" consumes messages through the "eachMessage" handler and accepts a client configuration for the KafkaJS client and a consumer configuration for the KafkaJS consumer client.  
 To use the "eachBatch" handler you need to manage the KafkaJS client yourself:
-```
+```javascript
 const kafkaExpress = require('../src/kafka-express');
 const { Kafka } = require('kafkajs');
 
