@@ -93,16 +93,6 @@ class Topic extends Handler {
     return this;
   }
 
-  handleError(err, req, res, out) {
-    if (req.topic !== this.name) {
-      debug(`Topic ${this.name} do not handle ${req.topic} errors`);
-      setImmediate(out, err);
-      return;
-    }
-
-    super.handleError(err, req, res, out);
-  }
-
   handle(req, res, out) {
     if (this.matchTopic(req.topic)) {
       req.params = this.params;
