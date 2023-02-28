@@ -99,9 +99,10 @@ describe('Handler tests', () => {
       handler.addLayer(layer, () => true);
     });
 
-    handler.handle({}, {}, done);
-
-    expect(mockLayerHandle).toHaveBeenCalledTimes(5);
+    handler.handle({}, {}, () => {
+      expect(mockLayerHandle).toHaveBeenCalledTimes(5);
+      done();
+    });
   });
 
   test('handler pass error through its layers and out', (done) => {
@@ -143,13 +144,12 @@ describe('Handler tests', () => {
     });
 
     handler.handle({}, {}, (err) => {
+      expect(mockLayerHandle).toHaveBeenCalledTimes(2);
+      expect(mockErrorHandler).toHaveBeenCalledTimes(2);
+      expect(mockLayerError).toHaveBeenCalled();
       expect(err).toBeInstanceOf(Error);
       done();
     });
-
-    expect(mockLayerHandle).toHaveBeenCalledTimes(2);
-    expect(mockErrorHandler).toHaveBeenCalledTimes(2);
-    expect(mockLayerError).toHaveBeenCalled();
   });
 
   test('handler do not handle error', (done) => {

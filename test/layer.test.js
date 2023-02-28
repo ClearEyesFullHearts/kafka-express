@@ -65,7 +65,7 @@ describe('Layer tests', () => {
       done();
     });
   });
-  test('layer do not handle an request with an error middleware', (done) => {
+  test('layer do not handle a request with an error middleware', (done) => {
     const layer = new LayerClass();
     const mockLayerHandle = jest.fn((err, req, res, next) => {
       next(err);
