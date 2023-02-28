@@ -41,7 +41,7 @@ class Topic extends Handler {
       if (path != null) {
         // fast path for * (everything matched in a param)
         if (this.regexp.fast_star) {
-          this.params = { 0: this.decode_param(path) };
+          this.params = { 0: decodeURIComponent(path) };
           this.path = path;
           return true;
         }
@@ -67,7 +67,7 @@ class Topic extends Handler {
       for (let i = 1; i < match.length; i += 1) {
         const key = keys[i - 1];
         const prop = key.name;
-        const val = this.decode_param(match[i]);
+        const val = decodeURIComponent(match[i]);
 
         if (val !== undefined || !(hasOwnProperty.call(params, prop))) {
           params[prop] = val;
@@ -75,14 +75,6 @@ class Topic extends Handler {
       }
 
       return true;
-    };
-
-    this.decode_param = (val) => {
-      if (typeof val !== 'string' || val.length === 0) {
-        return val;
-      }
-
-      return decodeURIComponent(val);
     };
   }
 

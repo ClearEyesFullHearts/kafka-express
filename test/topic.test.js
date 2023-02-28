@@ -51,24 +51,57 @@ describe('Topic tests', () => {
       });
     });
   });
-  test('topic handles only the matching topic messages on error', (done) => {
+
+  test('topic do not handle error directly', (done) => {
     const topic = new TopicClass('my.topic.kafka');
 
     const mockErrorHandle = jest.fn((err, req, res, next) => {
       next(err);
     });
-
-    const myError = new Error();
     topic.use(mockErrorHandle);
 
-    topic.handleError(myError, { topic: 'my.topic.kafka' }, {}, () => {
-      expect(mockErrorHandle).toHaveBeenCalledTimes(1);
-      topic.handleError(myError, { topic: 'not.my.topic.kafka' }, {}, () => {
-        expect(mockErrorHandle).toHaveBeenCalledTimes(1);
+    topic.handleError(new Error(), { topic: 'my.topic.kafka' }, {}, (err1) => {
+      expect(err1).toBeInstanceOf(Error);
+      expect(mockErrorHandle).not.toHaveBeenCalled();
+      topic.handleError(new Error(), { topic: 'another.topic.kafka' }, {}, (err2) => {
+        expect(err2).toBeInstanceOf(Error);
+        expect(mockErrorHandle).not.toHaveBeenCalled();
         done();
       });
     });
   });
-  test('topic handles parametered matching topic', () => {});
-  test('topic handles parametered matching topic on error', () => {});
+
+  test('topic handles parametered matching topic', (done) => {
+    const topic = new TopicClass('my.topic.:id');
+    let myParam = '';
+    const mockLayerHandle = jest.fn((req, res, next) => {
+      myParam = req.params.id;
+      next();
+    });
+    topic.use(mockLayerHandle);
+    topic.handle({ topic: 'my.topic.138' }, {}, () => {
+      expect(mockLayerHandle).toHaveBeenCalledTimes(1);
+      expect(myParam).toBe('138');
+      done();
+    });
+  });
+
+  test('* topic handles every messages', (done) => {
+    const topic = new TopicClass('*');
+
+    const mockLayerHandle = jest.fn((req, res, next) => {
+      next();
+    });
+    topic.use(mockLayerHandle);
+    topic.handle({ topic: 'my.topic.138' }, {}, () => {
+      expect(mockLayerHandle).toHaveBeenCalledTimes(1);
+      topic.handle({ topic: 'test.test' }, {}, () => {
+        expect(mockLayerHandle).toHaveBeenCalledTimes(2);
+        topic.handle({ topic: 'notatopic' }, {}, () => {
+          expect(mockLayerHandle).toHaveBeenCalledTimes(3);
+          done();
+        });
+      });
+    });
+  });
 });
