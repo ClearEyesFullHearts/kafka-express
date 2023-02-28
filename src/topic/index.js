@@ -102,20 +102,13 @@ class Topic extends Handler {
   }
 
   handleError(err, req, res, out) {
-    if (this.matchTopic(req.topic)) {
-      req.params = this.params;
-
-      const done = this.restore(out, req, 'next');
-
-      const next = this.getnext(done, req, res);
-      req.next = next;
-
-      next(err);
+    if (req.topic !== this.name) {
+      debug(`Topic ${this.name} do not handle ${req.topic} errors`);
+      setImmediate(out, err);
       return;
     }
 
-    debug(`Topic ${this.name} do not handle ${req.topic} errors`);
-    setImmediate(out, err);
+    super.handleError(err, req, res, out);
   }
 
   handle(req, res, out) {
