@@ -1,4 +1,4 @@
-const kafkaExpress = require('../src/kafka-express');
+const kafkaExpress = require('../lib/kafka-express');
 
 const server = kafkaExpress();
 
@@ -52,7 +52,7 @@ outTopic.use((req, res) => {
   console.log('hello topic 4', req);
   res.end();
 });
-server.mount(outTopic);
+server.use(outTopic);
 
 server.use(myguyErrored);
 
@@ -66,3 +66,34 @@ const csConf = {
 };
 
 server.listen(clConf, csConf);
+
+/*
+const kafkaExpress = require('../lib/kafka-express');
+
+const { Topic } = kafkaExpress;
+
+const server = kafkaExpress();
+
+const testTopic = new Topic('test');
+const outTopic = new Topic('out');
+const noMiddlewareTopic = new Topic('no');
+
+testTopic.use((req, res) => {
+  console.log('hello test');
+  next();
+});
+outTopic.use((req, res) => {
+  console.log('hello out');
+  res.end();
+});
+
+outTopic.use(noMiddlewareTopic);
+testTopic.use(outTopic);
+
+server.use(testTopic);
+
+// defined paths here are ['test', 'test.out']
+console.log(server.paths);
+// defined topics here are [ /^test\/?$/i, /^test\.out\/?$/i ]
+console.log(server.topics);
+*/

@@ -1,4 +1,4 @@
-const kafkaExpress = require('../src/kafka-express');
+const kafkaExpress = require('../lib/kafka-express');
 
 const server = kafkaExpress();
 

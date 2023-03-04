@@ -4,4 +4,4 @@
  * MIT Licensed
  */
 
-module.exports = require('./src/kafka-express');
+module.exports = require('./lib/kafka-express');

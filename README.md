@@ -77,24 +77,45 @@ const {
 ```
 The request object is an event dispatcher and emits the 'close' event when the request cycle ends.  
   
-The "Topic" object replaces the Router object. Note that you can only mount a topic to the application and not on one another.  
+The "Topic" object replaces the Router object. Note that you can mount a topic to another topic to create chained topics but only those that have a mounted middleware will be subscribed to the kafka server.  
 ```javascript
-const { Topic } = require('kafka-express');
-const outTopic = new Topic('test-topic');
+const kafkaExpress = require('../lib/kafka-express');
+
+const { Topic } = kafkaExpress;
+
+const server = kafkaExpress();
+
+const testTopic = new Topic('test');
+const outTopic = new Topic('out');
+const noMiddlewareTopic = new Topic('no');
+
+testTopic.use((req, res) => {
+  console.log('hello test');
+  next();
+});
 outTopic.use((req, res) => {
-  console.log('hello topic');
+  console.log('hello out');
   res.end();
 });
-server.mount(outTopic);
+
+outTopic.use(noMiddlewareTopic);
+testTopic.use(outTopic);
+
+server.use(testTopic);
+
+// defined paths here are ['test', 'test.out']
+console.log(server.paths);
+// defined topics here are [ /^test\/?$/i, /^test\.out\/?$/i ]
+console.log(server.topics);
 ```
   
-You can subscribe to topics using a Regexp and including parameters (i.e 'topic.name.:param').  
+You can subscribe to topics using a Regexp and including parameters (i.e 'topic.name.:param'), these parameters will be added to the request object.  
 You need to be aware that the KafkaJS client will only subscribe to the topics that match your regex AND already exists on the broker. It will not add topics that are created later.  
 The default separator is "." instead of "/".  
   
 ## KafkaJS
 The "Application.listen" consumes messages through the "eachMessage" handler and accepts a client configuration for the KafkaJS client and a consumer configuration for the KafkaJS consumer client.  
-To use the "eachBatch" handler you need to manage the KafkaJS client yourself:
+To use the "eachBatch" handler you need to manage the KafkaJS client yourself and use the onMessage function of the application:
 ```javascript
 const kafkaExpress = require('../src/kafka-express');
 const { Kafka } = require('kafkajs');
@@ -108,6 +129,8 @@ const kafka = new Kafka(clientConfig);
 const consumer = kafka.consumer(consumerConfig);
 
 await consumer.connect();
+
+// server.topics get you all topics that have a middleware, in regex format
 await consumer.subscribe({ topics: server.topics });
 
 await this.consumer.run({
