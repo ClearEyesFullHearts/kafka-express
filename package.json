@@ -20,7 +20,7 @@
   "dependencies": {
     "debug": "^4.3.4",
     "kafkajs": "^2.2.3",
-    "middlewary": "^1.0.0",
+    "middlewary": "^2.0.0",
     "path-to-regexp": "0.1.7"
   },
   "devDependencies": {
