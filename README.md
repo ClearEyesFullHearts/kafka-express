@@ -6,6 +6,7 @@ Start a server that consumes messages from a kafka server, listening to one or m
   
 ### "in the style of Express.js"  
 Defines the topics you want to listen to as express routes and add middlewares to them, just like you would to an express server.  
+It uses [middlewary](https://www.npmjs.com/package/middlewary)
   
 # Usage  
 ```javascript
