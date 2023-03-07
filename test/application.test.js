@@ -85,6 +85,7 @@ describe('Application tests', () => {
         value: JSON.stringify({ foo: 'bar' }),
       },
     };
+    const kafkaConsumer = {};
 
     const app = new Application();
     const result = [];
@@ -106,7 +107,7 @@ describe('Application tests', () => {
 
     app.use(testTopic);
 
-    await app.onMessage(kafkaMessage);
+    await app.onMessage(kafkaConsumer, kafkaMessage);
 
     expect(result).toEqual([
       'first',
@@ -124,6 +125,7 @@ describe('Application tests', () => {
         value: JSON.stringify({ foo: 'bar' }),
       },
     };
+    const kafkaConsumer = {};
 
     const app = new Application();
     const result = [];
@@ -146,7 +148,7 @@ describe('Application tests', () => {
     app.use(testTopic);
 
     try {
-      await app.onMessage(kafkaMessage);
+      await app.onMessage(kafkaConsumer, kafkaMessage);
     } catch (err) {
       expect(err.message).toBe('error from middleware');
 
@@ -170,6 +172,7 @@ describe('Application tests', () => {
         value: JSON.stringify({ foo: 'bar' }),
       },
     };
+    const kafkaConsumer = {};
 
     const app = new Application();
     const result = [];
@@ -200,7 +203,7 @@ describe('Application tests', () => {
       next();
     });
 
-    await app.onMessage(kafkaMessage);
+    await app.onMessage(kafkaConsumer, kafkaMessage);
 
     expect(result).toEqual([
       'first',
