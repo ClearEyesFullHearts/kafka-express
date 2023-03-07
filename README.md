@@ -51,7 +51,9 @@ const consumerConf = {
   groupId: 'kafka-express-test-consumer',
 };
 
-server.listen(clConf, csConf);
+const fromBeginning = true;
+
+server.listen(clConf, csConf, fromBeginning);
 
 ```
   
@@ -64,6 +66,7 @@ const {
   raw, // raw kafka message (KafkaMessage)
   topic, // name of the topic sending the message (string)
   path, // name of the topic sending the message (string)
+  kafkaConsumer, // The KafkaJS consumer object in case you to need to interact with it in your handlers (consumer object)
   partition, // partition id (string)
   key, // message key (string)
   value, // message value (string)
@@ -115,7 +118,7 @@ You need to be aware that the KafkaJS client will only subscribe to the topics t
 The default separator is "." instead of "/".  
   
 ## KafkaJS
-The "Application.listen" consumes messages through the "eachMessage" handler and accepts a client configuration for the KafkaJS client and a consumer configuration for the KafkaJS consumer client.  
+The "Application.listen" consumes messages through the "eachMessage" handler and accepts a client configuration for the KafkaJS client and a consumer configuration for the KafkaJS consumer client. You can specify the "fromBeginning" property as a third argument, it defaults to false if not present.  
 To use the "eachBatch" handler you need to manage the KafkaJS client yourself and use the onMessage function of the application:
 ```javascript
 const kafkaExpress = require('../src/kafka-express');
@@ -132,12 +135,12 @@ const consumer = kafka.consumer(consumerConfig);
 await consumer.connect();
 
 // server.topics get you all topics that have a middleware, in regex format
-await consumer.subscribe({ topics: server.topics });
+await consumer.subscribe({ topics: server.topics, fromBeginning: true });
 
-await this.consumer.run({
+await consumer.run({
   eachBatch: async (batch) => {
     for (let message of batch.messages) {
-      await server.onMessage(message);
+      await server.onMessage(consumer, message);
     }
   },
 });
