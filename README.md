@@ -73,6 +73,8 @@ const {
   body, // message value converted to JSON if possible (object)
   headers, // message headers if present (object)
   params, // converted params from the topic name if present (object)
+  res, // the response object
+  next, // the next callback
 } = req;
 
 const {
@@ -83,7 +85,7 @@ The request object is an event dispatcher and emits the 'close' event when the r
   
 The "Topic" object replaces the Router object. Note that you can mount a topic to another topic to create chained topics but only those that have a mounted middleware will be subscribed to the kafka server.  
 ```javascript
-const kafkaExpress = require('../lib/kafka-express');
+const kafkaExpress = require('kafka-express');
 
 const { Topic } = kafkaExpress;
 
