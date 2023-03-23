@@ -34,12 +34,12 @@ server.use('another-test-topic', (req, res, next) => {
 
 server.use('test.topic.*', (req, res, next) => {
   console.log('all topics that start by test.topic middleware');
-  res.end();
+  res.status(201).end();
 });
 
 server.use((err, req, res, next) => {
   console.log('Global error middleware');
-  next();
+  res.status(500).end(err);
 });
 
 const clientConf = {
@@ -63,6 +63,7 @@ If you are unfamiliar with how express middlewares work, I would suggest you rea
 For obvious reasons the request and reponse objects you receive in your middlewares are different than for a HTTP request:  
 ```
 const {
+  app, // The kafka-express running application
   raw, // raw kafka message (KafkaMessage)
   topic, // name of the topic sending the message (string)
   path, // name of the topic sending the message (string)
@@ -78,10 +79,15 @@ const {
 } = req;
 
 const {
+  req, // The request object
+  app, // The kafka-express running application
+  statusCode, // Status code for the response (default to 200)
+
   end(), // function to call to end the request-response cycle
+  status(), // Sets the status for the response. It is chainable.
 } = res;
 ```
-The request object is an event dispatcher and emits the 'close' event when the request cycle ends.  
+The response object is an event dispatcher and emits the 'finish' event when the request cycle ends.  
   
 The "Topic" object replaces the Router object. Note that you can mount a topic to another topic to create chained topics but only those that have a mounted middleware will be subscribed to the kafka server.  
 ```javascript
